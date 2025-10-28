@@ -127,10 +127,12 @@ export default class Enemy {
     }
 
     resize(oldGameWidth, oldGameHeight) {
+        if (oldGameWidth <= 0 || oldGameHeight <= 0) return;
+
         const xRatio = (this.x + this.width / 2) / oldGameWidth;
         const yRatio = (this.y + this.height / 2) / oldGameHeight;
 
-        const oldBaseWidth = oldGameWidth * 0.08 * (this.type === 'red' ? 1.2 : 1);
+        const oldBaseWidth = this.baseWidth;
 
         this.baseWidth = this.game.width * 0.08;
         if (this.type === 'red') {
@@ -148,16 +150,21 @@ export default class Enemy {
 
         // We don't need to rescale the mesh directly since its scale is set in the update loop based on animation.
         // We only need to update the health bar geometry.
-        const healthBarGeo = new THREE.PlaneGeometry(this.baseWidth, 5); // Use baseWidth for consistency
-        this.healthBarMesh.geometry.dispose();
-        this.healthBarMesh.geometry = healthBarGeo;
-        
-        const healthBarBgGeo = new THREE.PlaneGeometry(this.baseWidth, 5);
-        this.healthBarBgMesh.geometry.dispose();
-        this.healthBarBgMesh.geometry = healthBarBgGeo;
+        if(this.healthBarMesh) {
+            this.healthBarMesh.geometry.dispose();
+            this.healthBarMesh.geometry = new THREE.PlaneGeometry(this.baseWidth, 5);
+        }
+        if(this.healthBarBgMesh) {
+            this.healthBarBgMesh.geometry.dispose();
+            this.healthBarBgMesh.geometry = new THREE.PlaneGeometry(this.baseWidth, 5);
+        }
 
-        this.hit(); // Call hit to recalculate health bar scale and position
-        this.health++; // and undo the damage from hit()
+        // Recalculate health bar visual state
+        if (this.health < this.maxHealth) {
+             const healthRatio = Math.max(0, this.health / this.maxHealth);
+             this.healthBarMesh.scale.x = healthRatio;
+             this.healthBarMesh.position.x = -(this.baseWidth * (1 - healthRatio)) / 2;
+        }
     }
 
     hit() {

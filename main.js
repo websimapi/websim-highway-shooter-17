@@ -27,17 +27,17 @@ window.addEventListener('load', () => {
     };
     
     let game;
-    let resizeTimeout;
 
     const handleResize = () => {
-        // No need for a debounce, as setCanvasSize and game.resize handle it efficiently.
-        // The main issue with the old debounce was capturing old sizes incorrectly.
+        // The core issue is that `game.width` and `canvas.width` could be out of sync
+        // during a resize event. We must capture the state *before* any changes.
         const oldWidth = game ? game.width : canvas.width;
         const oldHeight = game ? game.height : canvas.height;
 
         setCanvasSize(); 
         
         if (game) {
+            // Pass the captured old dimensions to the game's resize handler.
             game.resize(canvas.width, canvas.height, oldWidth, oldHeight);
         }
     };

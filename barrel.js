@@ -149,15 +149,11 @@ export default class Barrel {
         this.y = (this.game.height * yRatio) - (this.height / 2);
 
         // Re-scale the mesh
-        const scaleFactor = this.width / oldWidth;
-        this.mesh.scale.x *= scaleFactor;
-        this.mesh.scale.y *= scaleFactor;
-        this.mesh.scale.z *= scaleFactor;
-        
-        // Re-scale the text mesh
-        this.textMesh.scale.x *= scaleFactor;
-        this.textMesh.scale.y *= scaleFactor;
-        this.textMesh.scale.z *= scaleFactor;
+        if (oldWidth > 0) {
+            const scaleFactor = this.width / oldWidth;
+            this.mesh.scale.multiplyScalar(scaleFactor);
+            this.textMesh.scale.multiplyScalar(scaleFactor);
+        }
     }
 
     updateHealthText() {

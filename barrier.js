@@ -92,13 +92,12 @@ export default class Barrier {
         this.y = (this.game.height * yRatio) - (this.height / 2);
 
         // Re-create geometry with new dimensions
-        const oldGeo = this.mesh.geometry;
-        this.mesh.geometry = new THREE.PlaneGeometry(this.width, this.height);
-        oldGeo.dispose();
-
-        const oldTextGeo = this.textMesh.geometry;
-        this.textMesh.geometry = new THREE.PlaneGeometry(this.height * 1.5, this.height * 0.75);
-        oldTextGeo.dispose();
+        if (this.mesh) {
+            this.mesh.geometry.dispose();
+            this.mesh.geometry = new THREE.PlaneGeometry(this.width, this.height);
+            this.textMesh.geometry.dispose();
+            this.textMesh.geometry = new THREE.PlaneGeometry(this.height * 1.5, this.height * 0.75);
+        }
     }
 
     updateHealthText() {
